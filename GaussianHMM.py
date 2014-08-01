@@ -89,6 +89,9 @@ class GaussianHMM(object):
         for t in range(1, T):
             for k in range(K):
                 alpha_table[t][k] = np.dot(alpha_table[t-1,:], self.trans_probs[:,k]) * self.get_emission_prob(k, x[t])
+            if not np.all(alpha_table[t]):
+                for k in range(K):
+                    alpha_table[t][k] = np.dot(alpha_table[t-1,:], self.trans_probs[:,k]) * self.get_emission_prob(k, x[t]) + 1e-250
             scaling_factors[t] = alpha_table[t,:].sum()  
             alpha_table[t,:] /= scaling_factors[t]
         ''' save results '''
@@ -105,9 +108,12 @@ class GaussianHMM(object):
         for t in range(T-2, -1, -1):
             for k in range(K):
                 beta_table[t][k] = np.sum([beta_table[t+1][j] * self.trans_probs[k][j] * self.get_emission_prob(j, x[t+1]) for j in range(K)])
+            if not np.all(beta_table[t]):
+                for k in range(K):
+                    beta_table[t][k] = np.sum([beta_table[t+1][j] * self.trans_probs[k][j] * self.get_emission_prob(j, x[t+1]) for j in range(K)]) + 1e-250
             beta_table[t,:] /= self.scaling_factors[t+1]
         ''' save results '''        
-        self.beta_table = beta_table        
+        self.beta_table = beta_table 
 
     '''*****************************'''        
     ''' Compute Gamma and Xi Tables '''
