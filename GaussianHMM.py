@@ -6,6 +6,7 @@ from gini import GRLC
 
 MIN_START_PROB = 1e-200
 MIN_TRANS_PROB = 1e-200
+MIN_ALPHA_BETA = 1e-250
 MIN_COV_VAL = 1e-5
 MAX_ITER = 10
 MIN_GINI = .5
@@ -84,6 +85,9 @@ class GaussianHMM(object):
         scaling_factors = np.zeros(T)
         for k in range(K):
             alpha_table[0][k] = self.start_probs[k] * self.get_emission_prob(k, x[0])
+        if not np.all(alpha_table[0]):
+            for k in range(K):
+                alpha_table[0][k] = self.start_probs[k] * self.get_emission_prob(k, x[0]) + MIN_ALPHA_BETA
         scaling_factors[0] = alpha_table[0].sum() 
         alpha_table[0,:] /= scaling_factors[0]
         for t in range(1, T):
@@ -91,7 +95,7 @@ class GaussianHMM(object):
                 alpha_table[t][k] = np.dot(alpha_table[t-1,:], self.trans_probs[:,k]) * self.get_emission_prob(k, x[t])
             if not np.all(alpha_table[t]):
                 for k in range(K):
-                    alpha_table[t][k] = np.dot(alpha_table[t-1,:], self.trans_probs[:,k]) * self.get_emission_prob(k, x[t]) + 1e-250
+                    alpha_table[t][k] = np.dot(alpha_table[t-1,:], self.trans_probs[:,k]) * self.get_emission_prob(k, x[t]) + MIN_ALPHA_BETA
             scaling_factors[t] = alpha_table[t,:].sum()  
             alpha_table[t,:] /= scaling_factors[t]
         ''' save results '''
@@ -110,7 +114,7 @@ class GaussianHMM(object):
                 beta_table[t][k] = np.sum([beta_table[t+1][j] * self.trans_probs[k][j] * self.get_emission_prob(j, x[t+1]) for j in range(K)])
             if not np.all(beta_table[t]):
                 for k in range(K):
-                    beta_table[t][k] = np.sum([beta_table[t+1][j] * self.trans_probs[k][j] * self.get_emission_prob(j, x[t+1]) for j in range(K)]) + 1e-250
+                    beta_table[t][k] = np.sum([beta_table[t+1][j] * self.trans_probs[k][j] * self.get_emission_prob(j, x[t+1]) for j in range(K)]) + MIN_ALPHA_BETA
             beta_table[t,:] /= self.scaling_factors[t+1]
         ''' save results '''        
         self.beta_table = beta_table 
