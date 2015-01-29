@@ -1,5 +1,7 @@
-This repository contains Python (2.7.X) code for an inertial regularized Gaussian hidden
-Markov model, useful for segmentation of multivariate time series data.
+This repository contains Python (2.7.X) code for an inertial hidden
+Markov model with Gaussian emissions, useful for segmentation of multivariate time series data.
+
+This is source code from the paper "Inertial Hidden Markov Models: Modeling Change in Muktivariate Time Series" from AAAI 2015.
 
 The code depends on the following libraries for Python: scipy, numpy and scikit-learn.
 
