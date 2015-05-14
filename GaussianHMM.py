@@ -25,8 +25,8 @@ class GaussianHMM(object):
 
     def __init__(self, number_of_states, sequence, regularization_mode = 0):        
         self.num_states = number_of_states
-        emission_means, emission_covariances = self.get_kmeans_emission_init(sequence)
-        self.emission_density_objs = [multivariate_normal(mean=emission_means[k], cov=emission_covariances[k]) for k in range(number_of_states)]
+        emission_means, emission_covariances = self.get_kmeans_emission_init(sequence) 
+        self.emission_density_objs = [multivariate_normal(mean=emission_means[k], cov=emission_covariances[k], allow_singular=True) for k in range(number_of_states)]
         start_probs, transition_probs = self.get_random_start_and_trans_probs()        
         self.start_probs = start_probs
         self.trans_probs = transition_probs
@@ -219,7 +219,7 @@ class GaussianHMM(object):
             means = np.dot(self.gamma_table[:,k].T, x) / denom
             demeaned = (x - means)
             cov_mat = np.dot(self.gamma_table[:, k] * demeaned.T, demeaned) / denom + .01 * np.eye(D)
-            self.emission_density_objs[k] = multivariate_normal(mean=means, cov=cov_mat)
+            self.emission_density_objs[k] = multivariate_normal(mean=means, cov=cov_mat, allow_singular=True)
 
     '''************************'''        
     '''    Decode (Viterbi)    '''
@@ -261,7 +261,7 @@ class GaussianHMM(object):
         iterations = 0
         if init:            
             means, covs = self.get_kmeans_emission_init(sequence)
-            self.emission_density_objs = [multivariate_normal(mean=means[k], cov=covs[k]) for k in range(K)]            
+            self.emission_density_objs = [multivariate_normal(mean=means[k], cov=covs[k], allow_singular=True) for k in range(K)]            
             start_probs, transition_probs = self.get_random_start_and_trans_probs()
             self.start_probs = start_probs
             self.trans_probs = transition_probs

@@ -3,7 +3,7 @@ Markov model with Gaussian emissions, useful for segmentation of multivariate ti
 
 This is source code from the paper "Inertial Hidden Markov Models: Modeling Change in Muktivariate Time Series" from AAAI 2015.
 
-The code depends on the following libraries for Python: scipy, numpy and scikit-learn.
+The code depends on the following libraries for Python: scipy >= 0.15.1, numpy and scikit-learn.
 
 The repository contains the following files:
 =============================================
